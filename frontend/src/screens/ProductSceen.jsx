@@ -3,22 +3,31 @@ import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { Row, Col, Image, ListGroup, Card, Button } from 'react-bootstrap';
 import Rating from '../components/Rating'
-import axios from 'axios';
+import { PROXY } from '../constants.js'; // Import the constant
 
 
 const ProductSceen = () => {
-  const[product, setProduct] = useState({});
-
+  const [product, setProduct] = useState({});
   const { id: productId } = useParams();
-  
+
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data } = await axios.get(`/api/products/${productId}`);
-      setProduct(data);
-    }
+      try {
+        const response = await fetch(`${PROXY}/api/products/${productId}`);
+
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        setProduct(data);
+      } catch (error) {
+        console.error('Error fetching product:', error.message);
+      }
+    };
 
     fetchProduct();
-  }, [productId])
+  }, [productId]);
 
   return <>
     <Link className="btn btn-light my-3" to="/">Go back</Link>

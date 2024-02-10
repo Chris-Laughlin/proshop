@@ -33,7 +33,7 @@ const RegisterScreen = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        if(password != confirmPassword){
+        if(password !== confirmPassword){
             toast.error('Password do not match');
             return;
         }

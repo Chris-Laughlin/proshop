@@ -23,6 +23,9 @@ const PlaceOrderScreen = () => {
         }
     }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
 
+
+    //This is the problem Right here
+    //Error: Not authorized, no token
     const placeOrderHandler = async () => {
         try {
             const res = await createOrder({
@@ -129,7 +132,7 @@ const PlaceOrderScreen = () => {
                         </Row>
                     </ListGroup.Item>
                     <ListGroup.Item>
-                        {error && <Message variant="danger">{error}</Message>}
+                        {error && (<Message variant="danger">{error.data.message}</Message>)}
                     </ListGroup.Item>
                     <ListGroup.Item>
                         <Button type="button" className="btn-block" disabled={cart.cartItems === 0}

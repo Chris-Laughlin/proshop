@@ -6,7 +6,8 @@ import Loader from '../components/Loader';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery} from '../slices/ordersApiSlice';
+import { useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery,
+        useDeliverOrderMutation} from '../slices/ordersApiSlice';
 
 const OrderScreen = () => {
 
@@ -18,6 +19,8 @@ const OrderScreen = () => {
     const [payOrder, {isLoading: loadingPay}] = usePayOrderMutation();
 
     const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
+
+    const [deliverOrder, { isLoading: loadingDeliver}] = useDeliverOrderMutation();
 
     const {data: paypal, 
         isLoading: loadingPayPal, 
@@ -65,6 +68,17 @@ const OrderScreen = () => {
     function onError(err){ 
         toast.error(err.message);
     }
+
+    const deliverOrderHandler = async () => {
+        try {
+            await deliverOrder(orderId);
+            refetch();
+            toast.success('Order Delivered');
+        } catch (err) {
+            toast.error(err?.data?.message || err.message);
+        }
+    }
+
     function createOrder(data, actions){ 
         return actions.order.create({
             purchase_units: [
@@ -183,6 +197,16 @@ const OrderScreen = () => {
                                         </div>
                                     </div>
                                 )}
+                            </ListGroup.Item>
+                        )}
+
+                        {loadingDeliver && <Loader />}
+
+                        {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                            <ListGroup.Item>
+                                <Button type='button' className='btn btn-block' onClick={ deliverOrderHandler }>
+                                    Mark As Delivered
+                                </Button>
                             </ListGroup.Item>
                         )}
                     </ListGroup>
